@@ -2,58 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Calendar, Clock, CheckCircle2, User, Phone, MapPin, MoreHorizontal, Plus } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Logo } from '../components/common/Logo';
-
-// Mock data to represent incoming form submissions
-const MOCK_BOOKINGS = [
-  {
-    id: 'B-1001',
-    name: 'Sarah Jenkins',
-    phone: '0412 345 678',
-    address: '42 Example Street, Sunnybank',
-    service: 'Full Residential',
-    date: '2026-04-10',
-    status: 'pending',
-    notes: 'Please watch out for the dog gate on the left side.',
-    createdAt: '2026-04-06T10:30:00',
-  },
-  {
-    id: 'B-1002',
-    name: 'Michael Chen',
-    phone: '0488 999 111',
-    address: '15 Leafy Avenue, Springwood',
-    service: 'The Clean Up',
-    date: '2026-04-12',
-    status: 'confirmed',
-    notes: 'Grass is about knee-high in the back.',
-    createdAt: '2026-04-05T14:15:00',
-  },
-  {
-    id: 'B-1003',
-    name: 'Emma Watson',
-    phone: '0422 123 456',
-    address: '88 River Road, Fig Tree Pocket',
-    service: 'The Quick Trim',
-    date: '2026-04-08',
-    status: 'completed',
-    notes: '',
-    createdAt: '2026-04-01T09:00:00',
-  },
-];
+import { supabase, type Booking } from '../lib/supabase';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const [bookings, setBookings] = useState(MOCK_BOOKINGS);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simple auth check
+  // Simple auth check & fetch data
   useEffect(() => {
     const isAdmin = sessionStorage.getItem('isAdmin');
     if (!isAdmin) {
       navigate('/admin');
+      return;
     }
+
+    fetchBookings();
   }, [navigate]);
+
+  const fetchBookings = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      if (data) setBookings(data as Booking[]);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     sessionStorage.removeItem('isAdmin');
@@ -168,7 +153,20 @@ export function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
-                {bookings.map((booking) => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                      Loading bookings...
+                    </td>
+                  </tr>
+                ) : bookings.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                      No bookings found.
+                    </td>
+                  </tr>
+                ) : (
+                  bookings.map((booking) => (
                   <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -177,7 +175,7 @@ export function AdminDashboard() {
                         </div>
                         <div>
                           <div className="font-medium text-slate-900">{booking.name}</div>
-                          <div className="text-xs text-slate-500">ID: {booking.id}</div>
+                          <div className="text-xs text-slate-500">ID: {booking.id.substring(0,8)}...</div>
                         </div>
                       </div>
                     </td>
@@ -194,7 +192,11 @@ export function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-slate-900">{booking.service}</div>
+                      <div className="font-medium text-slate-900">
+                        {booking.service === 'quickTrim' ? 'The Quick Trim' : 
+                         booking.service === 'fullResidential' ? 'Full Residential' : 
+                         booking.service === 'cleanUp' ? 'The Clean Up' : booking.service}
+                      </div>
                       {booking.notes && (
                         <div className="text-xs text-slate-500 truncate max-w-[200px] mt-1" title={booking.notes}>
                           Note: {booking.notes}
@@ -210,15 +212,7 @@ export function AdminDashboard() {
                       </Button>
                     </td>
                   </tr>
-                ))}
-                
-                {bookings.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                      No bookings found.
-                    </td>
-                  </tr>
-                )}
+                )))}
               </tbody>
             </table>
           </div>

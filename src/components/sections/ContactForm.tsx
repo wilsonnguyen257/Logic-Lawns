@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { supabase } from "../../lib/supabase";
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,12 +36,30 @@ export function ContactForm() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call for form submission
-    // Replace this with actual Formspree/Netlify integration later
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const formData = new FormData(e.currentTarget);
     
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .insert([
+          {
+            name: formData.get('name'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            service: serviceType,
+            notes: formData.get('message'),
+            status: 'pending'
+          }
+        ]);
+
+      if (error) throw error;
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      alert('There was an error submitting your request. Please try again or call us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
