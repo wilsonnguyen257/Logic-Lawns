@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Logo } from "../common/Logo";
-import { Button } from "../common/Button";
+import { Button } from "../ui/button";
 import { ArrowRight, Leaf, Shield, Clock } from "lucide-react";
 
 export function Hero() {
@@ -14,7 +14,7 @@ export function Hero() {
       <div className="container px-4 mx-auto">
         <nav className="flex items-center justify-between mb-16 md:mb-24">
           <Logo />
-          <Button variant="outline" size="sm" onClick={() => document.getElementById('contact')?.scrollIntoView()}>
+          <Button variant="default" className="rounded-full bg-brand-600 hover:bg-brand-700" size="sm" onClick={() => document.getElementById('contact')?.scrollIntoView()}>
             Book Now
           </Button>
         </nav>

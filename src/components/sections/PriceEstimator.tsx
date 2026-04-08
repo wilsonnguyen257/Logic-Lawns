@@ -1,8 +1,8 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "../common/Card";
-import { Button } from "../common/Button";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
 import { usePriceEstimator, BlockSize, ServiceType } from "../../hooks/usePriceEstimator";
 
 export function PriceEstimator() {
@@ -141,7 +141,6 @@ export function PriceEstimator() {
                   </p>
                   
                   <Button 
-                    variant="primary" 
                     className="w-full bg-brand-500 hover:bg-brand-400 text-white border-none"
                     onClick={handlePreFillForm}
                   >

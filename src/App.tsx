@@ -1,23 +1,16 @@
 import React from 'react';
-import { Hero } from './components/sections/Hero';
-import { Services } from './components/sections/Services';
-import { Advantage } from './components/sections/Advantage';
-import { PriceEstimator } from './components/sections/PriceEstimator';
-import { ContactForm } from './components/sections/ContactForm';
-import { Footer } from './components/sections/Footer';
+import { Routes, Route } from 'react-router-dom';
+import { HomePage } from './pages/HomePage';
+import { AdminLogin } from './pages/AdminLogin';
+import { AdminDashboard } from './pages/AdminDashboard';
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <main className="flex-grow">
-        <Hero />
-        <Services />
-        <Advantage />
-        <PriceEstimator />
-        <ContactForm />
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    </Routes>
   );
 }
 

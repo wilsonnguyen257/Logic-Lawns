@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle } from "lucide-react";
-import { Button } from "../common/Button";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,78 +81,62 @@ export function ContactForm() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                      Full Name *
-                    </label>
-                    <input
+                    <Label htmlFor="name">Full Name *</Label>
+                    <Input
                       type="text"
                       id="name"
                       name="name"
                       required
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                       placeholder="John Doe"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
-                      Phone Number *
-                    </label>
-                    <input
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Input
                       type="tel"
                       id="phone"
                       name="phone"
                       required
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                       placeholder="0400 000 000"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="address" className="block text-sm font-medium text-slate-700">
-                    Property Address *
-                  </label>
-                  <input
+                  <Label htmlFor="address">Property Address *</Label>
+                  <Input
                     type="text"
                     id="address"
                     name="address"
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                     placeholder="123 Example Street, Suburb"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="service" className="block text-sm font-medium text-slate-700">
-                    Service Required *
-                  </label>
-                  <select
-                    id="service"
-                    name="service"
-                    required
-                    value={serviceType}
-                    onChange={(e) => setServiceType(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-white"
-                  >
-                    <option value="" disabled>Select a service...</option>
-                    <option value="quickTrim">The Quick Trim</option>
-                    <option value="fullResidential">Full Residential</option>
-                    <option value="cleanUp">The Clean Up</option>
-                    <option value="other">Other / Not Sure</option>
-                  </select>
+                  <Label htmlFor="service">Service Required *</Label>
+                  <Select value={serviceType} onValueChange={setServiceType} required name="service">
+                    <SelectTrigger id="service" className="w-full">
+                      <SelectValue placeholder="Select a service..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="quickTrim">The Quick Trim</SelectItem>
+                      <SelectItem value="fullResidential">Full Residential</SelectItem>
+                      <SelectItem value="cleanUp">The Clean Up</SelectItem>
+                      <SelectItem value="other">Other / Not Sure</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="message" className="block text-sm font-medium text-slate-700">
-                    Additional Details (Optional)
-                  </label>
-                  <textarea
+                  <Label htmlFor="message">Additional Details (Optional)</Label>
+                  <Textarea
                     id="message"
                     name="message"
                     rows={4}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors resize-none"
                     placeholder="Any specific access requirements or areas of concern?"
+                    className="resize-none"
                   />
                 </div>
 
