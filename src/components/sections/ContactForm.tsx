@@ -13,11 +13,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { supabase } from "../../lib/supabase";
+import { validateBookingInput } from "../../lib/booking-rules";
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [serviceType, setServiceType] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     // Listen for custom event from PriceEstimator
@@ -35,28 +37,47 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError("");
     
     const formData = new FormData(e.currentTarget);
+
+    const bookingInput = {
+      name: String(formData.get('name') ?? ''),
+      phone: String(formData.get('phone') ?? ''),
+      address: String(formData.get('address') ?? ''),
+      service: serviceType,
+      notes: String(formData.get('message') ?? ''),
+      status: 'pending' as const,
+    };
+
+    const validationErrors = validateBookingInput(bookingInput);
+    if (validationErrors.length > 0) {
+      setSubmitError(validationErrors[0]);
+      setIsSubmitting(false);
+      return;
+    }
     
     try {
       const { error } = await supabase
         .from('bookings')
         .insert([
           {
-            name: formData.get('name'),
-            phone: formData.get('phone'),
-            address: formData.get('address'),
+            name: bookingInput.name.trim(),
+            phone: bookingInput.phone.trim(),
+            address: bookingInput.address.trim(),
             service: serviceType,
-            notes: formData.get('message'),
+            notes: bookingInput.notes.trim() || null,
             status: 'pending'
           }
         ]);
 
       if (error) throw error;
       setIsSubmitted(true);
+      setServiceType("");
+      e.currentTarget.reset();
     } catch (error) {
       console.error('Error submitting booking:', error);
-      alert('There was an error submitting your request. Please try again or call us directly.');
+      setSubmitError('There was an error submitting your request. Please try again or call us directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +156,7 @@ export function ContactForm() {
 
                 <div className="space-y-2">
                   <Label htmlFor="service">Service Required *</Label>
-                  <Select value={serviceType} onValueChange={setServiceType} required name="service">
+                  <Select value={serviceType} onValueChange={setServiceType} name="service">
                     <SelectTrigger id="service" className="w-full">
                       <SelectValue placeholder="Select a service..." />
                     </SelectTrigger>
@@ -158,6 +179,10 @@ export function ContactForm() {
                     className="resize-none"
                   />
                 </div>
+
+                {submitError ? (
+                  <p className="text-sm text-red-600">{submitError}</p>
+                ) : null}
 
                 <Button 
                   type="submit" 
