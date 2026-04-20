@@ -333,6 +333,9 @@ export function AdminDashboard() {
             <span className="text-sm font-medium text-slate-500 hidden md:block">Admin Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/admin/offers')} className="hidden sm:flex">
+              Offer Writer
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="hidden sm:flex">
               View Live Site
             </Button>
